@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const config = require('../config/defualt')
 
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://Ashish:Classified12@postis-moiah.mongodb.net/test?retryWrites=true&w=majority", {
+    await mongoose.connect(config.mongoURI, {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,

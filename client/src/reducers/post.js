@@ -7,7 +7,8 @@ import {
     GET_POSTS,
     POST_ERROR,
     UPDATE_LIKES,
-    EDIT_POST
+    EDIT_POST,
+    EDIT_COMMENT
 } from "../actions/types";
 
 const initialState = {
@@ -60,20 +61,11 @@ export default function (state = initialState, action) {
                 loading: false,
             }
         case ADD_COMMENT:
+        case REMOVE_COMMENT:
+        case EDIT_COMMENT:
             return {
                 ...state,
                 post: { ...state.post, comments: payload },
-                loading: false
-            }
-        case REMOVE_COMMENT:
-            return {
-                ...state,
-                post: {
-                    ...state.post,
-                    comments: state.post.comments.filter(
-                        comment => comment._id !== payload
-                    )
-                },
                 loading: false
             }
         case UPDATE_LIKES:

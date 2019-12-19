@@ -7,7 +7,8 @@ import {
     GET_POST,
     GET_POSTS,
     POST_ERROR,
-    EDIT_POST
+    EDIT_POST,
+    EDIT_COMMENT
 } from "./types";
 import history from '../history'
 import axios from 'axios'
@@ -156,9 +157,29 @@ export const removeComment = (postId, commentId) => async dispatch => {
 
         dispatch({
             type: REMOVE_COMMENT,
-            payload: commentId
+            payload: res.data
         })
 
+    } catch (err) {
+        dispatch({ type: POST_ERROR })
+        console.error(err.message)
+    }
+}
+
+export const editComment = (postId, commentId, formData) => async dispatch => {
+    const config = {
+        headders: {
+            "Content-Type": "application/json"
+        }
+    }
+
+    try {
+        const res = await axios.put(`/api/posts/${postId}/comment/${commentId}`, formData, config)
+
+        dispatch({
+            type: EDIT_COMMENT,
+            payload: res.data
+        })
     } catch (err) {
         dispatch({ type: POST_ERROR })
         console.error(err.message)

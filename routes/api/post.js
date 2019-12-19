@@ -318,4 +318,55 @@ router.delete(
 )
 
 
+// PUT /api/posts/:postid/comment/:commentid
+// Edit a comment 
+// private route
+
+router.put(
+    "/:postid/comment/:commentid",
+    [
+        auth,
+        check("comment", "Make sure the comment field is not empty")
+            .notEmpty()
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+        const { comment } = req.body
+        try {
+            let post = await Post.findById(req.params.postid)
+
+            if (!post) {
+                return res.status(404).json({ msg: "Post not found" })
+            }
+
+            let prevComment = post.comments.find(
+                comment => comment.id === req.params.commentid)
+
+            if (!prevComment) {
+                return res.status(404).json({ msg: "Comment not found" })
+            }
+
+            if (!prevComment.user.equals(req.user.id)) {
+                return res.status(500).json({ msg: "Unauthorized" })
+            }
+
+            prevComment.text = comment;
+
+            post.comments = post.comments.map(
+                comment => comment.id === req.params.commentid ? prevComment : comment
+            )
+
+            await post.save()
+
+            res.json(post.comments)
+        } catch (err) {
+            console.error(err.message)
+            return res.status(500).send("Server Error")
+        }
+    }
+)
 module.exports = router;

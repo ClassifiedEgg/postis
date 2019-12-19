@@ -130,6 +130,12 @@ const Post = ({ loading, post, getPost, addComment, deletePost, auth: { isAuthen
                             fullWidth
                             value={formData.comment}
                             onChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                            onKeyPress={e => {
+                                if (e.key === 'Enter') {
+                                    onSubmit(e)
+                                }
+                            }}
+                            maxLength={140}
                         />
                     </EuiFlexItem>
                     <EuiFlexItem>

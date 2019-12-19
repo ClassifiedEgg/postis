@@ -10,14 +10,19 @@ import {
     EuiText,
     EuiOverlayMask,
     EuiConfirmModal,
+    EuiFieldText
 } from '@elastic/eui'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { removeComment } from "../../actions/posts";
+import { removeComment, editComment } from "../../actions/posts";
 
-const PostComment = ({ comment, auth: { loading, user, isAuthenticated }, removeComment, postId }) => {
+const PostComment = ({ comment, auth: { loading, user, isAuthenticated }, removeComment, editComment, postId }) => {
 
     const [showModal, setShowModal] = useState(false)
+    const [editCommentForm, setEditCommentForm] = useState(false)
+    const [formData, setFormData] = useState({
+        comment: ''
+    })
 
     let destroyModal;
 
@@ -59,7 +64,10 @@ const PostComment = ({ comment, auth: { loading, user, isAuthenticated }, remove
                             <Fragment>
                                 <EuiFlexItem grow={false}>
                                     <EuiButtonEmpty
-                                        onClick={() => window.alert('Button clicked')}
+                                        onClick={() => {
+                                            setFormData({ comment: comment.text })
+                                            setEditCommentForm(true)
+                                        }}
                                         iconType="arrowDown"
                                         color='primary'
                                         iconSide="left">
@@ -80,11 +88,28 @@ const PostComment = ({ comment, auth: { loading, user, isAuthenticated }, remove
                     </EuiFlexGroup>
                     <EuiFlexGroup>
                         <EuiFlexItem>
-                            <EuiText>
-                                <p>
-                                    {comment.text}
-                                </p>
-                            </EuiText>
+                            {!editCommentForm ?
+                                (
+                                    <EuiText>
+                                        <p>{comment.text}</p>
+                                    </EuiText>
+                                ) : (
+                                    <EuiFieldText
+                                        placeholder="Write a comment"
+                                        name='comment'
+                                        fullWidth
+                                        type='text'
+                                        value={formData.comment}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                editComment(postId, comment._id, formData)
+                                                setEditCommentForm(false)
+                                            }
+                                        }}
+                                        onChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+                                    />
+                                )
+                            }
                         </EuiFlexItem>
                     </EuiFlexGroup>
                 </EuiFlexItem>
@@ -103,4 +128,4 @@ const mapStateToProps = state => ({
     auth: state.auth
 })
 
-export default connect(mapStateToProps, { removeComment })(PostComment)
+export default connect(mapStateToProps, { removeComment, editComment })(PostComment)
